@@ -60,11 +60,11 @@ export default {
         },
 
         getSuggested() {
-            if (!this.input) {
-                this.suggestions = [];
+            // if (!this.input) {
+            //     this.suggestions = [];
 
-                return;
-            }
+            //     return;
+            // }
 
             if (this.suggestionLimit === 0) {
                 this.suggestions = [];
@@ -72,7 +72,11 @@ export default {
                 return;
             }
 
-            let queryString = `?filter[containing]=${encodeURIComponent(this.input)}&limit=${this.suggestionLimit}`;
+            let queryString = `?limit=${this.suggestionLimit}`;
+
+            if (this.input) {
+                queryString += `&filter[containing]=${encodeURIComponent(this.input)}`;
+            }
 
             if (this.type) {
                 queryString += `&filter[type]=${this.type}`;
@@ -81,11 +85,11 @@ export default {
             window.axios.get(`/nova-vendor/spatie/nova-tags-field${queryString}`).then(response => {
                 // If the input was cleared by the time the request finished,
                 // clear the suggestions too.
-                if (!this.input) {
-                    this.suggestions = [];
+                // if (!this.input) {
+                //     this.suggestions = [];
 
-                    return;
-                }
+                //     return;
+                // }
 
                 this.suggestions = response.data.filter(suggestion => {
                     return !this.tags.find(tag => tag === suggestion);
@@ -130,6 +134,9 @@ export default {
                         this.addTag();
                     }
                 },
+                focus: e => {
+                    this.throttledGetSuggested();
+                }
             },
         });
     },
